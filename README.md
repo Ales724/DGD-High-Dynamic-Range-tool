@@ -26,7 +26,12 @@ Export at 24bit FLAC/WAV 44.1kHz
 
 # Getting official lossless instrumentals 
 
-Official lossless instrumentals for all albums are available DRM-free on this Website https://www.supraphonline.cz/umelec/346896-dance-gavin-dance (each album costs approximately 14USD). I am not going to link to torrents or illegal downloads, pay for your music.
+Official lossless instrumentals for all albums are available DRM-free on these Websites 
+
+https://www.supraphonline.cz/umelec/346896-dance-gavin-dance (each album costs approximately 14USD)
+https://www.qobuz.com/us-en/interpreter/dance-gavin-dance/313471/page/3. (15.09USD)
+
+I am not going to link to torrents or illegal downloads, pay for your music.
 
 # Folder structure
 
