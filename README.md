@@ -1,3 +1,5 @@
+todo make the readme make sense
+
 Prerequisites:
 Operating system capable of
 Python 3.11 64-bit or more.
