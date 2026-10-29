@@ -286,7 +286,7 @@ def main():
                 return candidate
         return None
 
-    for number in range(1, 14):
+    for number in range(1, 20):
         vocal_file = find_audio_file(vocals_dir, f"{number}Voc")
         instru_file = find_audio_file(instru_dir, f"{number}Ins")
 
