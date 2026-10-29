@@ -83,6 +83,7 @@ def process_track(
     instrumental_path,
     original_path,
     output_path,
+    mode="vocals",
     target_lufs=-17.0,
     peak_ceiling_dbfs=-1.0,
 ):
@@ -159,77 +160,88 @@ def process_track(
         f"Gain: {gain:.10f}"
     )
 
-    print("Performing cancellation...")
-
-    # Original full mix - gain-matched instrumental
-    # This leaves the original mix as-is and subtracts the instrumental.
-    vocal = original - gain * instrumental
+    if mode == "vocals":
+        print("Extracting vocals: original mix minus matched instrumental...")
+        output_audio = original - gain * instrumental
+    elif mode == "inverted-vocals":
+        print("Extracting polarity-inverted vocals: matched instrumental minus original mix...")
+        # (matched instrumental) - (vocals + instrumental) = -vocals.
+        # Do not loudness-normalize this mode: changing its gain would prevent
+        # it from cancelling the vocal component when added to the original mix.
+        output_audio = gain * instrumental - original
+    elif mode == "instrumental":
+        print("Preparing the aligned, gain-matched instrumental...")
+        output_audio = gain * instrumental
+    else:
+        raise ValueError(f"Unsupported mode: {mode}")
 
     # Remove tiny numerical DC offset.
-    vocal -= np.mean(
-        vocal,
+    output_audio -= np.mean(
+        output_audio,
         axis=0,
         keepdims=True
     )
 
-    # Normalize integrated loudness to the requested LUFS target.
-    # If the resulting sample peak would exceed the safety ceiling,
-    # reduce the gain further to avoid clipping when writing PCM FLAC.
     meter = pyln.Meter(sr)
-    measured_lufs = meter.integrated_loudness(vocal)
+    measured_lufs = meter.integrated_loudness(output_audio)
     if not np.isfinite(measured_lufs):
         raise RuntimeError("Could not measure loudness (audio may be silent).")
 
-    loudness_gain_db = target_lufs - measured_lufs
-    vocal *= 10.0 ** (loudness_gain_db / 20.0)
+    peak = float(np.max(np.abs(output_audio))) if output_audio.size else 0.0
+    peak_dbfs = 20.0 * np.log10(max(peak, 1e-12))
 
-    peak = float(np.max(np.abs(vocal))) if vocal.size else 0.0
-    peak_ceiling = 10.0 ** (peak_ceiling_dbfs / 20.0)
-    peak_limited_by_gain = False
-    if peak > peak_ceiling:
-        vocal *= peak_ceiling / peak
-        peak_limited_by_gain = True
-
-    final_lufs = meter.integrated_loudness(vocal)
-    peak_dbfs = 20.0 * np.log10(max(float(np.max(np.abs(vocal))), 1e-12))
-    print(f"Measured loudness before normalization: {measured_lufs:.2f} LUFS")
-    print(f"Target loudness: {target_lufs:.2f} LUFS")
-    print(f"Final loudness: {final_lufs:.2f} LUFS")
-    print(f"Sample peak: {peak_dbfs:.2f} dBFS")
-    if peak_limited_by_gain:
-        print(
-            f"WARNING: Reaching the target would exceed the "
-            f"{peak_ceiling_dbfs:.1f} dBFS peak ceiling. "
-            f"Gain was reduced to prevent clipping, so final loudness "
-            f"is below the target."
+    if mode == "inverted-vocals":
+        # Preserve exact relative level for phase cancellation. Floating-point
+        # WAV can store samples outside +/-1 without clipping.
+        final_lufs = measured_lufs
+        print("Loudness normalization: disabled to preserve cancellation level.")
+        print(f"Integrated loudness: {final_lufs:.2f} LUFS")
+        print(f"Sample peak: {peak_dbfs:.2f} dBFS")
+        if peak > 1.0:
+            print("NOTE: Peak exceeds 0 dBFS; writing 32-bit float WAV to avoid clipping.")
+        print(f"Writing: {output_path.name}")
+        sf.write(
+            output_path,
+            output_audio.astype(np.float32),
+            sr,
+            format="WAV",
+            subtype="FLOAT"
         )
+    else:
+        # Normalize integrated loudness to the requested LUFS target.
+        # If the resulting peak would exceed the safety ceiling, reduce gain.
+        loudness_gain_db = target_lufs - measured_lufs
+        output_audio *= 10.0 ** (loudness_gain_db / 20.0)
 
-    print(
-        f"Writing: {output_path.name}"
-    )
+        peak = float(np.max(np.abs(output_audio))) if output_audio.size else 0.0
+        peak_ceiling = 10.0 ** (peak_ceiling_dbfs / 20.0)
+        peak_limited_by_gain = False
+        if peak > peak_ceiling:
+            output_audio *= peak_ceiling / peak
+            peak_limited_by_gain = True
 
-    # Write temporary floating-point WAV.
-    temp_wav = output_path.with_suffix(".tmp.wav")
+        final_lufs = meter.integrated_loudness(output_audio)
+        peak_dbfs = 20.0 * np.log10(max(float(np.max(np.abs(output_audio))), 1e-12))
+        print(f"Measured loudness before normalization: {measured_lufs:.2f} LUFS")
+        print(f"Target loudness: {target_lufs:.2f} LUFS")
+        print(f"Final loudness: {final_lufs:.2f} LUFS")
+        print(f"Sample peak: {peak_dbfs:.2f} dBFS")
+        if peak_limited_by_gain:
+            print(
+                f"WARNING: Reaching the target would exceed the "
+                f"{peak_ceiling_dbfs:.1f} dBFS peak ceiling. "
+                f"Gain was reduced to prevent clipping, so final loudness "
+                f"is below the target."
+            )
 
-    sf.write(
-        temp_wav,
-        vocal.astype(np.float32),
-        sr,
-        format="WAV",
-        subtype="FLOAT"
-    )
-
-    # Convert to FLAC through soundfile.
-    # PCM_24 gives plenty of precision for the final file.
-    sf.write(
-        output_path,
-        vocal,
-        sr,
-        format="FLAC",
-        subtype="PCM_24"
-    )
-
-    temp_wav.unlink(missing_ok=True)
+        print(f"Writing: {output_path.name}")
+        sf.write(
+            output_path,
+            output_audio,
+            sr,
+            format="FLAC",
+            subtype="PCM_24"
+        )
 
     print("Done.")
 
@@ -238,8 +250,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description=(
-            "Batch vocal extraction using instrumental/master cancellation, "
-            "with loudness normalization."
+            "Batch vocal extraction, polarity-inverted vocal extraction, "
+            "or instrumental level matching."
         )
     )
 
@@ -255,6 +267,16 @@ def main():
         type=float,
         default=-17.0,
         help="Target integrated loudness in LUFS (default: -17)."
+    )
+
+    parser.add_argument(
+        "--mode",
+        choices=("vocals", "inverted-vocals", "instrumental"),
+        default="vocals",
+        help=(
+            "Output vocals (default), polarity-inverted vocals, or the "
+            "aligned, gain-matched official instrumental."
+        )
     )
 
     args = parser.parse_args()
@@ -286,7 +308,7 @@ def main():
                 return candidate
         return None
 
-    for number in range(1, 20):
+    for number in range(1, 14):
         vocal_file = find_audio_file(vocals_dir, f"{number}Voc")
         instru_file = find_audio_file(instru_dir, f"{number}Ins")
 
@@ -298,13 +320,19 @@ def main():
             print(f"[SKIP] Missing {number}Ins.wav or {number}Ins.flac in {instru_dir}")
             continue
 
-        output_file = output_dir / f"{number}VocalExtract.flac"
+        if args.mode == "vocals":
+            output_file = output_dir / f"{number}VocalExtract.flac"
+        elif args.mode == "inverted-vocals":
+            output_file = output_dir / f"{number}VocalExtract_Inverted.wav"
+        else:
+            output_file = output_dir / f"{number}InstrumentalExtract.flac"
 
         try:
             process_track(
                 instru_file,
                 vocal_file,
                 output_file,
+                mode=args.mode,
                 target_lufs=args.target_lufs
             )
         except Exception as e:
@@ -314,6 +342,8 @@ def main():
     print("=" * 60)
     print("All tracks processed.")
     print(f"Output folder: {output_dir}")
+    if args.mode == "inverted-vocals":
+        print("Inverted vocal residuals are saved as 32-bit float WAV without loudness normalization.")
 
 
 if __name__ == "__main__":
