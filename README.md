@@ -26,32 +26,29 @@ Official lossless instrumentals for all albums are available DRM-free on this We
 
 # Folder structure
 
-Script expects numbered WAV/FLAC files in two folders (Vocals & Instru), with filenames matching this exact pattern:
+Script expects numbered WAV/FLAC files in two folders (`Vocals` & `Instru`), with filenames matching this exact pattern:
+
+```text
+YourFolder/
+├── dgd_vocalextract_reversed_cancellation.py
+├── Vocals/
+│   ├── 1Voc.wav
+│   ├── 2Voc.wav
+│   ├── ...
+│   └── 18Voc.wav
+├── Instru/
+│   ├── 1Ins.wav
+│   ├── 2Ins.wav
+│   ├── ...
+│   └── 18Ins.wav
+└── Output/
+    ├── 1VocalExtract.flac
+    ├── 2VocalExtract.flac
+    └── ...
+```
 
 
-
-`Vocals/
-
-1Voc.wav
-
-2Voc.wav
-
-...
-
-13Voc.wav
-
-Instru/
-
-1Ins.wav
-
-2Ins.wav
-
-...
-
-13Ins.wav``
-
-
-Output/ — created automatically
+Output folder — created automatically
 
 
 # Setting up Python
@@ -71,16 +68,16 @@ source .venv/bin/activate`
 WINDOWS
 
 Run:
-`py -m pip install numpy scipy soundfile`
+`python -m pip install numpy scipy soundfile pyloudnorm`
 
 
 # Run the script
 
 Linux:
-`python3 dgd_vocalextract_normalized_wav_flac.py`
+`python3 dgd_vocalextract_reversed_cancellation.py`
 
 Windows:
-`py dgd_vocalextract_normalized_wav_flac.py`
+`py dgd_vocalextract_reversed_cancellation.py`
 
 
 
