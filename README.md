@@ -1,10 +1,22 @@
-1. Prerequisites
-Any modern operating system capable of
+Prerequisites:
+Operating system capable of
 Python 3.11 64-bit or more.
 
+Original CD in lossless WAV format
+Official Instrumental
 
-You do not need FFmpeg, a GPU, or a separate audio editor for this script. Its audio operations are handled by the Python libraries.
-https://www.python.org/downloads/
+Tip: You can rip your CD in lossless quality with iTunes on Windows/Mac
+Rhythmbox on Linux
+
+I recommend using a declipper in Audacity on the CD.
+Normalize peaks to -12dB, then use the declipper. Export as 16/24bit FLAC or WAV
+
+
+The official lossless instrumentals are available DRM-free on this Website https://www.supraphonline.cz/umelec/346896-dance-gavin-dance. Each instrumental album costs approximately 14USD. There are other ways to get the instrumentals, but this is the method i used. I am not going to link to torrents or illegal downloads, pay for your music.
+
+
+
+Setting up Python to work on Windows
 
 Run:
 py -m pip install numpy scipy soundfile
