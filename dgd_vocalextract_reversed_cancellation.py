@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
+import pyloudnorm as pyln
 from scipy.signal import correlate
 
 
@@ -81,7 +82,9 @@ def find_gain(original, instrumental):
 def process_track(
     instrumental_path,
     original_path,
-    output_path
+    output_path,
+    target_lufs=-17.0,
+    peak_ceiling_dbfs=-1.0,
 ):
 
     print()
@@ -169,6 +172,38 @@ def process_track(
         keepdims=True
     )
 
+    # Normalize integrated loudness to the requested LUFS target.
+    # If the resulting sample peak would exceed the safety ceiling,
+    # reduce the gain further to avoid clipping when writing PCM FLAC.
+    meter = pyln.Meter(sr)
+    measured_lufs = meter.integrated_loudness(vocal)
+    if not np.isfinite(measured_lufs):
+        raise RuntimeError("Could not measure loudness (audio may be silent).")
+
+    loudness_gain_db = target_lufs - measured_lufs
+    vocal *= 10.0 ** (loudness_gain_db / 20.0)
+
+    peak = float(np.max(np.abs(vocal))) if vocal.size else 0.0
+    peak_ceiling = 10.0 ** (peak_ceiling_dbfs / 20.0)
+    peak_limited_by_gain = False
+    if peak > peak_ceiling:
+        vocal *= peak_ceiling / peak
+        peak_limited_by_gain = True
+
+    final_lufs = meter.integrated_loudness(vocal)
+    peak_dbfs = 20.0 * np.log10(max(float(np.max(np.abs(vocal))), 1e-12))
+    print(f"Measured loudness before normalization: {measured_lufs:.2f} LUFS")
+    print(f"Target loudness: {target_lufs:.2f} LUFS")
+    print(f"Final loudness: {final_lufs:.2f} LUFS")
+    print(f"Sample peak: {peak_dbfs:.2f} dBFS")
+    if peak_limited_by_gain:
+        print(
+            f"WARNING: Reaching the target would exceed the "
+            f"{peak_ceiling_dbfs:.1f} dBFS peak ceiling. "
+            f"Gain was reduced to prevent clipping, so final loudness "
+            f"is below the target."
+        )
+
     print(
         f"Writing: {output_path.name}"
     )
@@ -203,8 +238,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description=(
-            "Batch vocal extraction using "
-            "instrumental/master cancellation."
+            "Batch vocal extraction using instrumental/master cancellation, "
+            "with loudness normalization."
         )
     )
 
@@ -213,6 +248,13 @@ def main():
         nargs="?",
         default=".",
         help="Directory containing Vocals and Instru."
+    )
+
+    parser.add_argument(
+        "--target-lufs",
+        type=float,
+        default=-17.0,
+        help="Target integrated loudness in LUFS (default: -17)."
     )
 
     args = parser.parse_args()
@@ -237,41 +279,36 @@ def main():
         exist_ok=True
     )
 
+    def find_audio_file(folder, stem):
+        # Accept .wav and .flac, case-insensitively.
+        for candidate in folder.iterdir():
+            if candidate.is_file() and candidate.stem.lower() == stem.lower() and candidate.suffix.lower() in {".wav", ".flac"}:
+                return candidate
+        return None
+
     for number in range(1, 14):
+        vocal_file = find_audio_file(vocals_dir, f"{number}Voc")
+        instru_file = find_audio_file(instru_dir, f"{number}Ins")
 
-        vocal_file = vocals_dir / f"{number}Voc.wav"
-        instru_file = instru_dir / f"{number}Ins.wav"
-
-        if not vocal_file.exists():
-            print(
-                f"[SKIP] Missing {vocal_file}"
-            )
+        if vocal_file is None:
+            print(f"[SKIP] Missing {number}Voc.wav or {number}Voc.flac in {vocals_dir}")
             continue
 
-        if not instru_file.exists():
-            print(
-                f"[SKIP] Missing {instru_file}"
-            )
+        if instru_file is None:
+            print(f"[SKIP] Missing {number}Ins.wav or {number}Ins.flac in {instru_dir}")
             continue
 
-        output_file = (
-            output_dir /
-            f"{number}VocalExtract.flac"
-        )
+        output_file = output_dir / f"{number}VocalExtract.flac"
 
         try:
-
             process_track(
                 instru_file,
                 vocal_file,
-                output_file
+                output_file,
+                target_lufs=args.target_lufs
             )
-
         except Exception as e:
-
-            print(
-                f"[ERROR] Track {number}: {e}"
-            )
+            print(f"[ERROR] Track {number}: {e}")
 
     print()
     print("=" * 60)
