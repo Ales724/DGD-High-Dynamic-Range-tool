@@ -10,7 +10,7 @@ Rhythmbox on Linux
 
 ## I recommend using a declipper in Audacity on the CD.
 
-Normalize peaks to -12dB, then use the declipper. Export as 16/24bit FLAC or WAV
+Normalize the original CD tracks peaks to −12 dBFS before applying Clip Fix. This provides headroom and prevents artifacting.
 
 
 <img width="540" height="360" alt="1 - effect normalize" src="https://github.com/user-attachments/assets/f203ebf4-3254-4d04-8a6b-f58fc456a82b" />
