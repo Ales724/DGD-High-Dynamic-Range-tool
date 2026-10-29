@@ -68,11 +68,11 @@ LINUX
 `
 ### If you get an error on Linux, run it in a virtual environment
 
-`sudo apt install python3-venv
-python3 -m venv .venv
-source .venv/bin/activate`
+`python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install numpy scipy soundfile pyloudnorm`
 
-`python -m pip install numpy scipy soundfile pyloudnorm`
+`python dgd_vocalextract_reversed_cancellation.py`
 
 WINDOWS
 
