@@ -84,8 +84,8 @@ def process_track(
     original_path,
     output_path,
     mode="vocals",
-    target_lufs=-16.5,
-    peak_ceiling_dbfs=-0.1,
+    target_lufs=-14.3,
+    peak_ceiling_dbfs=-0.01,
 ):
 
     print()
@@ -192,12 +192,12 @@ def process_track(
 
     if mode == "inverted-vocals":
         # Preserve exact relative level for phase cancellation. Floating-point
-        # WAV can store samples outside +/-0.1 without clipping.
+        # WAV can store samples outside +/-0.01 without clipping.
         final_lufs = measured_lufs
         print("Loudness normalization: disabled to preserve cancellation level.")
         print(f"Integrated loudness: {final_lufs:.2f} LUFS")
         print(f"Sample peak: {peak_dbfs:.2f} dBFS")
-        if peak > 0.1:
+        if peak > 0.01:
             print("NOTE: Peak exceeds 0 dBFS; writing 32-bit float WAV to avoid clipping.")
         print(f"Writing: {output_path.name}")
         sf.write(
@@ -265,8 +265,8 @@ def main():
     parser.add_argument(
         "--target-lufs",
         type=float,
-        default=-16.5,
-        help="Target integrated loudness in LUFS (default: -16.5)."
+        default=-14.3,
+        help="Target integrated loudness in LUFS (default: -14.3)."
     )
 
     parser.add_argument(
