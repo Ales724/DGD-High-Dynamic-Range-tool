@@ -1,3 +1,4 @@
+<img width="1229" height="526" alt="Screenshot from 2026-10-30 14-11-12" src="https://github.com/user-attachments/assets/6a9c621c-3262-4265-a11d-81fc1d48a4d0" />
 <img width="1888" height="599" alt="image" src="https://github.com/user-attachments/assets/41700f3d-21a2-414d-8409-1dbc8c9fb1b4" />
 
 
@@ -58,6 +59,7 @@ YourFolder/
     ├── 2VocalExtract.flac
     └── ...
 ```
+<img width="1740" height="1036" alt="Screenshot from 2026-10-30 14-10-44" src="https://github.com/user-attachments/assets/c7b48329-3947-4b7b-ae4a-2f2571c0ed49" />
 
 
 Output folder — created automatically
@@ -65,37 +67,95 @@ Output folder — created automatically
 
 # Setting up Python
 
-LINUX
+**Requirements:** Python 3.11 (64-bit) or newer.
 
-`python3 -m pip install numpy scipy soundfile pyloudnorm
-`
-### If you get an error on Linux, run it in a virtual environment
+Required Python libraries:
+- numpy
+- scipy
+- soundfile
+- pyloudnorm
 
-`````sudo apt install python3-venv`````
+## LINUX (Linux Mint / Ubuntu)
 
-`cd ~/Music/DGD`
-`
-python3 -m venv .venv`
+Open a terminal in the folder containing the script and the `Vocals` and `Instru` folders.
 
-`source .venv/bin/activate`
+For example:
 
-`python -m pip install numpy scipy soundfile pyloudnorm
-``
-``python dgd_vocalextract_reversed_cancellation.py`
+```bash
+cd ~/Music/DGD
+```
 
-WINDOWS
+Create a Python virtual environment:
 
-Run:
-`python -m pip install numpy scipy soundfile pyloudnorm`
+```bash
+sudo apt install python3-venv
+python3 -m venv .venv
+```
+
+Activate it:
+
+```bash
+source .venv/bin/activate
+```
+
+Install the required libraries:
+
+```bash
+python -m pip install numpy scipy soundfile pyloudnorm
+```
+
+## WINDOWS
+
+Open Command Prompt or PowerShell in the folder containing the script and the `Vocals` and `Instru` folders.
+
+Install the required libraries:
+
+```powershell
+py -m pip install numpy scipy soundfile pyloudnorm
+```
+
+# Running the script
+
+**Linux:**
+
+Activate the virtual environment first:
+
+```bash
+source .venv/bin/activate
+```
+
+Then run:
+
+```bash
+python dgd_vocalextract_reversed_cancellation.py
+```
+
+**Windows:**
+
+```powershell
+py dgd_vocalextract_reversed_cancellation.py
+```
+
+*note: i only tested the script on Linux, but the instructions should work on Windows. Open an issue or send me a DM with an error so i can work around it
+
+# Output
+
+The script automatically creates an `Output` folder.
+
+Processed tracks are saved as 24-bit FLAC files:
+
+```text
+Output/
+├── 1VocalExtract.flac
+├── 2VocalExtract.flac
+├── 3VocalExtract.flac
+└── ...
+```
+
+The script processes tracks numbered 1 through 18. Missing input pairs are skipped
 
 
-# Run the script
 
-Linux:
-`python3 dgd_vocalextract_reversed_cancellation.py`
-
-Windows:
-`py dgd_vocalextract_reversed_cancellation.py`
 
 
 
@@ -114,6 +174,6 @@ Known Issues:
 3rd track from Downtown Battle Mountain
 5th track from self-titled
 
-They sound terrible
+They sound weird.
 
-Didn't test other albums
+I ONLY TESTED FIRST TWO ALBUMS
