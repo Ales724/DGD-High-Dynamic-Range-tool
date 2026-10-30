@@ -171,9 +171,12 @@ The output files will be saved in Output, named 1VocalExtract.flac through 13Voc
 
 Known Issues:
 
-3rd track from Downtown Battle Mountain
-5th track from self-titled
-
+3rd track from Downtown Battle Mountain. 
+5th track from self-titled. 
 They sound weird.
+
+hidden track on last 13th song on self-titled gets removed, since it doesn't exist in instrumental form
+
+
 
 I ONLY TESTED FIRST TWO ALBUMS
