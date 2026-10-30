@@ -1,3 +1,6 @@
+<img width="1888" height="599" alt="image" src="https://github.com/user-attachments/assets/41700f3d-21a2-414d-8409-1dbc8c9fb1b4" />
+
+
 # Prerequisites
 Python 3.11 64-bit or newer.
 
