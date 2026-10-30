@@ -84,7 +84,7 @@ def process_track(
     original_path,
     output_path,
     mode="vocals",
-    target_lufs=-17.0,
+    target_lufs=-15.0,
     peak_ceiling_dbfs=-1.0,
 ):
 
@@ -265,8 +265,8 @@ def main():
     parser.add_argument(
         "--target-lufs",
         type=float,
-        default=-17.0,
-        help="Target integrated loudness in LUFS (default: -17)."
+        default=-15.0,
+        help="Target integrated loudness in LUFS (default: -15)."
     )
 
     parser.add_argument(
