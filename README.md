@@ -16,7 +16,7 @@ Normalize the original CD tracks peaks to −12 dB before applying Clip Fix. Thi
 <img width="540" height="360" alt="1 - effect normalize" src="https://github.com/user-attachments/assets/f203ebf4-3254-4d04-8a6b-f58fc456a82b" />
 <img width="540" height="360" alt="2 - -12dB" src="https://github.com/user-attachments/assets/4af46d64-e8ee-42cf-82e2-497514aaf133" />
 <img width="540" height="360" alt="3 - effect clip fix" src="https://github.com/user-attachments/assets/04c1cbff-efec-4542-8764-e8b5ec99e45a" />
-<img width="540" height="360" alt="4 - setting up clip fix" src="https://github.com/user-attachments/assets/229c0d6d-539a-46da-99a0-520cd76f54aa" />
+<img width="540" height="360" alt="4 - setting up clip fix" src="https://github.com/user-attachments/assets/abbe75a7-f845-4b91-a493-2acaf1eff411" />
 <img width="540" height="360" alt="6 - export" src="https://github.com/user-attachments/assets/75575dd4-99dd-4834-a340-d55523ac24e4" />
 <img width="480" height="360" alt="7 - export" src="https://github.com/user-attachments/assets/91afe8fc-b277-4ce4-9d56-6141d846c0ad" />
 
