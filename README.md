@@ -1,5 +1,5 @@
-<img width="1229" height="526" alt="Screenshot from 2026-10-30 14-11-12" src="https://github.com/user-attachments/assets/6a9c621c-3262-4265-a11d-81fc1d48a4d0" />
-<img width="1888" height="599" alt="image" src="https://github.com/user-attachments/assets/41700f3d-21a2-414d-8409-1dbc8c9fb1b4" />
+<img width="700" height="300" alt="Screenshot from 2026-10-30 14-11-12" src="https://github.com/user-attachments/assets/6a9c621c-3262-4265-a11d-81fc1d48a4d0" />
+<img width="700" height="300" alt="image" src="https://github.com/user-attachments/assets/41700f3d-21a2-414d-8409-1dbc8c9fb1b4" />
 
 
 # Prerequisites
@@ -59,7 +59,7 @@ YourFolder/
     ├── 2VocalExtract.flac
     └── ...
 ```
-<img width="1740" height="1036" alt="Screenshot from 2026-10-30 14-10-44" src="https://github.com/user-attachments/assets/c7b48329-3947-4b7b-ae4a-2f2571c0ed49" />
+<img width="800" height="480" alt="Screenshot from 2026-10-30 14-10-44" src="https://github.com/user-attachments/assets/c7b48329-3947-4b7b-ae4a-2f2571c0ed49" />
 
 
 Output folder — created automatically
